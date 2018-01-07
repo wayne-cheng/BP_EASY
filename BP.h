@@ -4,6 +4,7 @@
 class BP()
 {
     public:
+        BP();
         BP(int ni, int nh, int no);
        
         void sigmoid(x);
