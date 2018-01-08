@@ -1,79 +1,56 @@
-// #include "BP.h"
 #include <iostream>
-#include <cstdlib>
-#include <ctime>
+
+#include "BP.h"
 
 using namespace std;
 
-float** make_matrix(int row, int column, float fill = 0.0)
-{
-    float **m = new float *[column]; 
-
-    for (int i = 0; i < row; i++) {
-        m[i] = new float [column];
-        for (int j = 0; j < column; j++) {
-            m[i][j] = fill;
-        }
-    }
-
-    return m;
-}
-
-// float rand_num(float min, float max)
-// {
-//     int rand1, rand2;
-//     float rand_rate;
-//     srand((unsigned int)(time(NULL)));
-//     rand();
-//     rand();
-//     rand2 = rand();
-//     cout << "rand1 " << rand1 <<endl;
-//     cout << "rand2 " << rand2 <<endl;
-//     rand_rate = (rand2 / (float)32767);
-//     cout << "rand_num_rate" << rand_rate <<endl;
-//     return min + rand_rate * (max - min);
-// }
-
-float rand_num(float min, float max)
-{
-    float num[10];
-    srand((unsigned int)(time(NULL)));
-    for (int i = 0; i < 10; i++) {
-        num[i] = rand();
-    }
-    int j = rand() % 10;
-    return min + (max - min) * num[j] / RAND_MAX;
-}
-
-float* array(int num, float fill = 0.0)
-{
-    float* a = new float[num];
-    for (int i = 0; i < num; i++) {
-        a[i] = fill;
-    }
-    return a;
-}
-
+extern void demo();
 
 int main()
 {
-    // int row = 2;
-    // int column = 2;
-    // float fill = 3.2;
-    // float **mym = make_matrix(row, column, fill);
-    // for (int i = 0; i < row; i++) {
-    //     for (int j = 0; j < column; j++) {
-    //         cout << mym[i][j] << "\t";
-    //     }
-    //         cout << endl;
-    // }
-
-
-    // cout<< rand_num(0.2, 0.4) << endl;
-
-    float* ai = array(5, 2.0);
-    cout << ai[2] <<endl;
-
+    demo();
 
     return 0;
 }
+
+void demo()
+{
+    int ni = 2;
+    int nh = 2;
+    int no = 1;
+    // 创建一个神经网络：输入层有两个节点、隐藏层有两个节点、输出层有一个节点
+    Bp mybp = Bp(ni, nh, no);
+
+    //一个演示：教神经网络学习逻辑异或（XOR）------------可以换成你自己的数据试试
+    int data_num = 4;
+        
+    float** inputs = make_matrix(data_num, nh);
+    float** targets = make_matrix(data_num, no);
+
+    float eg_inputs[data_num][ni] = {  
+                                    {0,0}, 
+                                    {0,1},
+                                    {1,0},
+                                    {1,1}};
+    float eg_targets[data_num][no] = {
+                                    {0},
+                                    {1},
+                                    {1},
+                                    {0}};
+
+    for (int i = 0; i < data_num; i++) {
+        inputs[i] = (float *)&eg_inputs[i];
+        targets[i] = (float *)&eg_targets[i];
+    }
+
+    // 用一些模式训练它
+    mybp.train(inputs, targets, data_num);
+    // 测试训练的成果（不要吃惊哦）
+    for (int i = 0; i < data_num; i++)
+    {
+        mybp.test_result(inputs[data_num]);
+    }
+    // 看看训练好的权重（当然可以考虑把训练好的权重持久化）
+    //n.weights()
+}
+   

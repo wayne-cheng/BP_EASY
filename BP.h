@@ -1,15 +1,15 @@
 #ifndef BP
 #define BP
 
-class BP()
+class Bp
 {
     public:
-        BP();
-        BP(int ni, int nh, int no);
-       
-        void sigmoid(x);
-        void train(self, patterns, iterations=1000, N=0.5, M=0.1);
-        void weights(self);
+        Bp();
+        Bp(int ni, int nh, int no);
+
+        void train(float** inputs, float** targets, int data_num, int iterations = 10000, float N = 0.5, float M = 0.1);
+        void test_result(float* inputs);
+        void print_weights();
 
     private:
         int ni;
@@ -26,15 +26,17 @@ class BP()
         float** ci;
         float** co;
 
-        float* inputs;
-        double w;
-        double output;
+        float** inputs;
+        float** targets;
 
-        int update(self, inputs);
-        int backPropagate(self, targets, N, M):;
+        void update(float* inputs);
+        float back_propagate(float* targets, float N, float M);
 };
 
-extern void make_matrix();
-extern void rand();
+extern float** make_matrix(int row, int column, float fill = 0.0f);
+extern float* array(int num, float fill = 0.0f);
+extern float rand_num(float min, float max);
+extern float sigmoid(float x);
+extern float dsigmoid(float y);
 
 #endif

@@ -11,7 +11,7 @@
 
 using namespace std;
 
-BP::BP(int ni, int nh, int no)
+Bp::Bp(int ni, int nh, int no)
 {
     this->ni = ni + 1; //增加一个偏差节点
     this->nh = nh;
@@ -27,12 +27,12 @@ BP::BP(int ni, int nh, int no)
     this->wo = make_matrix(this->nh, this->no);
     //并设为随机值
     for (int i = 0; i < this->ni; i++) {
-        for(int j = 0, j < this->nh; j++) {
+        for(int j = 0; j < this->nh; j++) {
             this->wi[i][j] = rand_num(-0.2, 0.2);
         }
     } 
-     for (j = 0; j < this->nh; j++) {
-        for(k = 0, k < this->no; k++) {
+     for (int j = 0; j < this->nh; j++) {
+        for(int k = 0; k < this->no; k++) {
             this->wo[j][k] = rand_num(-2.0, 2.0);
         }
     }
@@ -42,7 +42,7 @@ BP::BP(int ni, int nh, int no)
     this->co = make_matrix(this->nh, this->no);
 }
 
-void update(float inputs[])
+void Bp::update(float* inputs)
 {
     //激活输入层
     for (int i = 0; i < this->ni - 1; i++) {
@@ -51,24 +51,24 @@ void update(float inputs[])
     }
     //激活隐藏层
     for (int j = 0; j < this->nh - 1; j++) {
-        sum = 0.0
-        for (i = 0; i < this->ni; i++) {
-            sum = sum + this->ai[i] * this->wi[i][j]
-        this->ah[j] = sigmoid(sum)
+        float sum = 0.0;
+        for (int i = 0; i < this->ni; i++) {
+            sum = sum + this->ai[i] * this->wi[i][j];
+        this->ah[j] = sigmoid(sum);
         }
     }
     //激活输出层
-    for (int k = 0; k < this->no, k++) {
-        sum = 0.0
-        for (j = 0; j < this->nh; j++) {
-            sum = sum + this->ah[j] * this->wo[j][k]
-        this->ao[k] = sigmoid(sum)
+    for (int k = 0; k < this->no; k++) {
+        float sum = 0.0;
+        for (int j = 0; j < this->nh; j++) {
+            sum = sum + this->ah[j] * this->wo[j][k];
+        this->ao[k] = sigmoid(sum);
         }
     }
 
 }
 
-float backPropagate(float targets[], float N, float M)//''' 反向传播 '''
+float Bp::back_propagate(float* targets, float N, float M)//''' 反向传播 '''
 {
     float error = 0.0;
     float change = 0.0;
@@ -83,14 +83,14 @@ float backPropagate(float targets[], float N, float M)//''' 反向传播 '''
     float* hidden_deltas = array(this->nh, 0.0);
     for (int j = 0; j < this->nh; j++) {
         error = 0.0;
-        for (k = 0; k < this->no; k++)
+        for (int k = 0; k < this->no; k++)
             error = error + output_deltas[k] * this->wo[j][k];
         hidden_deltas[j] = dsigmoid(this->ah[j]) * error;
     }
 
     // 更新输出层权重
-    for (j = 0; j < this->nh; j++) {
-        for (k = 0; k < this->no; k++) {
+    for (int j = 0; j < this->nh; j++) {
+        for (int k = 0; k < this->no; k++) {
             change = output_deltas[k] * this->ah[j];
             this->wo[j][k] = this->wo[j][k] + N * change + M * this->co[j][k];
             this->co[j][k] = change;
@@ -100,7 +100,7 @@ float backPropagate(float targets[], float N, float M)//''' 反向传播 '''
 
     // 更新输入层权重
     for (int i = 0; i < this->ni; i++) {
-        for (j = 0; j < this->nh; j++) {
+        for (int j = 0; j < this->nh; j++) {
             change = hidden_deltas[j] * this->ai[i];
             this->wi[i][j] = this->wi[i][j] + N * change + M * this->ci[i][j];
             this->ci[i][j] = change;
@@ -109,37 +109,23 @@ float backPropagate(float targets[], float N, float M)//''' 反向传播 '''
 
     // 计算误差
     error = 0.0;
-    for (k = 0; k < this->no; k++)
+    for (int k = 0; k < this->no; k++)
         error = error + 0.5 * pow((targets[k] - this->ao[k]), 2);
     return error;
 }
 
-float** make_matrix(int row, int column, float fill = 0.0)
-{
-    float **m = new float *[column]; 
-
-    for (i = 0; i < row; i++) {
-        m[i] = new float [column];
-        for (j = 0; j < column; j++) {
-            m[i][j] = fill;
-        }
-    }
-
-    return m;
-}
-
-void test_result(int inputs[])
+void Bp::test_result(float inputs[])
 {
     this->update(inputs);
     for (int i = 0; i < this->ni - 1; i++)
         cout << this->ai[i] << ",";
     cout << " -> ";
-    for (i = 0; i < this->no; i++)
+    for (int i = 0; i < this->no; i++)
         cout << this->ao[i] << ",";
     cout << endl;
 }
 
-void print_weights(void)
+void Bp::print_weights(void)
 {
     cout << "输入层权重:" << endl;
     for (int i = 0; i < this->ni; i++)
@@ -150,22 +136,23 @@ void print_weights(void)
         cout << this->wo[j] << endl;
 }
 
-void train(float** inputs, float** targets, iterations=1000, N = 0.5, M = 0.1)
+void Bp::train(float** inputs, float** targets, int data_num, int iterations, float N, float M)
 {
     // N: 学习速率(learning rate)
     // M: 动量因子(momentum factor)
+    float error;
     for (int i = 0; i < iterations; i++) {
-        error = 0.0
-        for (p in patterns) {
-            self.update(inputs)
-            error = error + self.backPropagate(targets, N, M)
+        error = 0.0;
+        for (int j = 0; j < data_num; j++) {
+            this->update(inputs[j]);
+            error = error + this->back_propagate(targets[j], N, M);
         }
         if (i % 100 == 0)
             printf("误差 %.5f\n", error);
     }
 }
 
-float* array(int num, float fill = 0.0)
+float* array(int num, float fill)
 {
     float* a = new float[num];
     for (int i = 0; i < num; i++) {
@@ -174,6 +161,19 @@ float* array(int num, float fill = 0.0)
     return a;
 }
 
+float** make_matrix(int row, int column, float fill)
+{
+    float **m = new float *[column]; 
+
+    for (int i = 0; i < row; i++) {
+        m[i] = new float [column];
+        for (int j = 0; j < column; j++) {
+            m[i][j] = fill;
+        }
+    }
+
+    return m;
+}
 
 float rand_num(float min, float max)
 {

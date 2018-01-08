@@ -3,6 +3,7 @@
         "cstdlib": "cpp",
         "iostream": "cpp",
         "ctime": "cpp",
-        "cmath": "cpp"
+        "cmath": "cpp",
+        "limits": "cpp"
     }
 }
