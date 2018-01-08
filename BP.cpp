@@ -38,37 +38,81 @@ BP::BP(int ni, int nh, int no)
     }
 
     //最后建立动量因子（矩阵）
-    this->self.ci = make_matrix(this->ni, this->nh);
+    this->ci = make_matrix(this->ni, this->nh);
     this->co = make_matrix(this->nh, this->no);
 }
 
-float update(float inputs[])
+void update(float inputs[])
 {
-    if len(inputs) != self.ni-1:
-        raise ValueError('与输入层节点数不符！')
-
-    # 激活输入层
-    for i in range(self.ni-1):
-        #self.ai[i] = sigmoid(inputs[i])
-        self.ai[i] = inputs[i]
-
-    # 激活隐藏层
-    for j in range(self.nh):
+    //激活输入层
+    for (int i = 0; i < this->ni - 1; i++) {
+        //this->ai[i] = sigmoid(inputs[i])
+        this->ai[i] = inputs[i];
+    }
+    //激活隐藏层
+    for (int j = 0; j < this->nh - 1; j++) {
         sum = 0.0
-        for i in range(self.ni):
-            sum = sum + self.ai[i] * self.wi[i][j]
-        self.ah[j] = sigmoid(sum)
-
-    # 激活输出层
-    for k in range(self.no):
+        for (i = 0; i < this->ni; i++) {
+            sum = sum + this->ai[i] * this->wi[i][j]
+        this->ah[j] = sigmoid(sum)
+        }
+    }
+    //激活输出层
+    for (int k = 0; k < this->no, k++) {
         sum = 0.0
-        for j in range(self.nh):
-            sum = sum + self.ah[j] * self.wo[j][k]
-        self.ao[k] = sigmoid(sum)
+        for (j = 0; j < this->nh; j++) {
+            sum = sum + this->ah[j] * this->wo[j][k]
+        this->ao[k] = sigmoid(sum)
+        }
+    }
 
-    return self.ao[:]
 }
 
+float backPropagate(float targets[], float N, float M)//''' 反向传播 '''
+{
+    float error = 0.0;
+    float change = 0.0;
+
+   // 计算输出层的误差
+    float* output_deltas = array(this->no, 0.0);
+    for (int k = 0; k < this->no; k++) {
+        error = targets[k] - this->ao[k];
+        output_deltas[k] = dsigmoid(this->ao[k]) * error;
+    }
+    // 计算隐藏层的误差
+    float* hidden_deltas = array(this->nh, 0.0);
+    for (int j = 0; j < this->nh; j++) {
+        error = 0.0;
+        for (k = 0; k < this->no; k++)
+            error = error + output_deltas[k] * this->wo[j][k];
+        hidden_deltas[j] = dsigmoid(this->ah[j]) * error;
+    }
+
+    // 更新输出层权重
+    for (j = 0; j < this->nh; j++) {
+        for (k = 0; k < this->no; k++) {
+            change = output_deltas[k] * this->ah[j];
+            this->wo[j][k] = this->wo[j][k] + N * change + M * this->co[j][k];
+            this->co[j][k] = change;
+            //print(N * change, M * this->co[j][k])
+        }
+    }
+
+    // 更新输入层权重
+    for (int i = 0; i < this->ni; i++) {
+        for (j = 0; j < this->nh; j++) {
+            change = hidden_deltas[j] * this->ai[i];
+            this->wi[i][j] = this->wi[i][j] + N * change + M * this->ci[i][j];
+            this->ci[i][j] = change;
+        }
+    }
+
+    // 计算误差
+    error = 0.0;
+    for (k = 0; k < this->no; k++)
+        error = error + 0.5 * pow((targets[k] - this->ao[k]), 2);
+    return error;
+}
 
 float** make_matrix(int row, int column, float fill = 0.0)
 {
@@ -82,6 +126,43 @@ float** make_matrix(int row, int column, float fill = 0.0)
     }
 
     return m;
+}
+
+void test_result(int inputs[])
+{
+    this->update(inputs);
+    for (int i = 0; i < this->ni - 1; i++)
+        cout << this->ai[i] << ",";
+    cout << " -> ";
+    for (i = 0; i < this->no; i++)
+        cout << this->ao[i] << ",";
+    cout << endl;
+}
+
+void print_weights(void)
+{
+    cout << "输入层权重:" << endl;
+    for (int i = 0; i < this->ni; i++)
+        cout << this->wi[i] << endl;
+    cout << endl;
+    cout << "输出层权重:" << endl;
+    for (int j = 0; j < this->nh; j++)
+        cout << this->wo[j] << endl;
+}
+
+void train(float** inputs, float** targets, iterations=1000, N = 0.5, M = 0.1)
+{
+    // N: 学习速率(learning rate)
+    // M: 动量因子(momentum factor)
+    for (int i = 0; i < iterations; i++) {
+        error = 0.0
+        for (p in patterns) {
+            self.update(inputs)
+            error = error + self.backPropagate(targets, N, M)
+        }
+        if (i % 100 == 0)
+            printf("误差 %.5f\n", error);
+    }
 }
 
 float* array(int num, float fill = 0.0)

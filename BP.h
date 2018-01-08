@@ -15,11 +15,20 @@ class BP()
         int ni;
         int nh;
         int no;
-        double input;
+
+        float* ai;
+        float* ah;
+        float* ao;
+        
+        float** wi;
+        float** wo;
+
+        float** ci;
+        float** co;
+
+        float* inputs;
         double w;
         double output;
-        float wi = makeMatrix(this->ni, this->nh)
-        float wo = makeMatrix(this->nh, this->no)
 
         int update(self, inputs);
         int backPropagate(self, targets, N, M):;

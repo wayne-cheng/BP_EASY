@@ -54,11 +54,11 @@ class NN:
         self.co = makeMatrix(self.nh, self.no)
 
     def update(self, inputs):
-        if len(inputs) != self.ni-1:
+        if len(inputs) != self.ni - 1:
             raise ValueError('与输入层节点数不符！')
 
         # 激活输入层
-        for i in range(self.ni-1):
+        for i in range(self.ni - 1):
             #self.ai[i] = sigmoid(inputs[i])
             self.ai[i] = inputs[i]
 
