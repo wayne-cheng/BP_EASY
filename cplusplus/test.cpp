@@ -1,6 +1,6 @@
 #include <iostream>
 
-#include "BP.h"
+#include "Bp.h"
 
 #define ITERATIONS 10000
 #define DATA_NUM 4
@@ -37,10 +37,11 @@ void demo()
 
     for (int i = 0; i < ITERATIONS; i++) {
         // 用一些模式训练它
+        mybp.error_total = 0.0;
         for (int j = 0; j < DATA_NUM; j++)
             mybp.train(inputs[j], targets[j]);
         if (i % 100 == 0)
-            printf("error_delt %.5f\n", mybp.error);
+            printf("error_total %.5f\n", mybp.error_total);
     }
 
     // 测试训练的成果

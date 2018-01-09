@@ -7,11 +7,11 @@ class Bp
         int ni;
         int nh;
         int no;
-        double error;
+        double error_total;
         
         Bp();
         Bp(int ni, int nh, int no);
-        void train(double inputs[], double targets[], double N = 0.5, double M = 0.1);
+        void train(double inputs[], double targets[]);
         void test_result(double inputs[]);
         void print_weights();
 
@@ -30,7 +30,7 @@ class Bp
         double** targets;
 
         void update(double inputs[]);
-        double back_propagate(double targets[], double N, double M);
+        void back_propagate(double targets[], double N = 0.5, double M = 0.1);
 };
 
 extern double** make_matrix(int row, int column, double fill = 0.0);

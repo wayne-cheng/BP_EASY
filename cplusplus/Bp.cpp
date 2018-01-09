@@ -49,7 +49,7 @@ Bp::Bp(int ni, int nh, int no)
     this->ci = make_matrix(this->ni, this->nh);
     this->co = make_matrix(this->nh, this->no);
 
-    this->error = 0.0;
+    this->error_total = 0.0;
 }
 
 void Bp::update(double inputs[])
@@ -61,7 +61,7 @@ void Bp::update(double inputs[])
         this->ai[i] = inputs[i];
     }
     //激活隐藏层
-    for (int j = 0; j < this->nh - 1; j++) {
+    for (int j = 0; j < this->nh; j++) {
         sum = 0.0;
         for (int i = 0; i < this->ni; i++)
             sum = sum + this->ai[i] * this->wi[i][j];
@@ -76,8 +76,10 @@ void Bp::update(double inputs[])
     }
 }
 
-double Bp::back_propagate(double* targets, double N, double M)//''' 反向传播 '''
+void Bp::back_propagate(double* targets, double N, double M)//''' 反向传播 '''
 {
+    // N: 学习速率(learning rate)
+    // M: 动量因子(momentum factor)
     double error;
     double change;
 
@@ -90,7 +92,7 @@ double Bp::back_propagate(double* targets, double N, double M)//''' 反向传播
     // 计算隐藏层的误差
     double* hidden_deltas = array(this->nh);
     for (int j = 0; j < this->nh; j++) {
-        error = 0.0f;
+        error = 0.0;
         for (int k = 0; k < this->no; k++)
             error = error + output_deltas[k] * this->wo[j][k];
         hidden_deltas[j] = dsigmoid(this->ah[j]) * error;
@@ -115,8 +117,14 @@ double Bp::back_propagate(double* targets, double N, double M)//''' 反向传播
     // 计算误差
     error = 0.0;
     for (int k = 0; k < this->no; k++)
-        error = error + 0.5 * pow((targets[k] - this->ao[k]), 2);
-    return error;
+        error += 0.5 * pow((targets[k] - this->ao[k]), 2);
+    this->error_total += error;
+}
+
+void Bp::train(double inputs[], double targets[])
+{
+    this->update(inputs);
+    this->back_propagate(targets);
 }
 
 void Bp::test_result(double inputs[])
@@ -139,14 +147,6 @@ void Bp::print_weights(void)
     cout << "输出层权重:" << endl;
     for (int j = 0; j < this->nh; j++)
         cout << this->wo[j] << endl;
-}
-
-void Bp::train(double* inputs, double* targets, double N, double M)
-{
-    // N: 学习速率(learning rate)
-    // M: 动量因子(momentum factor)
-    this->update(inputs);
-    this->error = this->error + this->back_propagate(targets, N, M);
 }
 
 
@@ -188,5 +188,5 @@ double sigmoid(double x)
 //sigmoid函数的导数
 double dsigmoid(double y)
 {
-    return 1.0 - y * y;
+    return 1.0 - pow(y, 2);
 }
