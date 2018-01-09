@@ -131,7 +131,7 @@ class NN:
         for j in range(self.nh):
             print(self.wo[j])
 
-    def train(self, patterns, iterations=1000, N=0.5, M=0.1):
+    def train(self, patterns, iterations=10000, N=0.5, M=0.1):
         # N: 学习速率(learning rate)
         # M: 动量因子(momentum factor)
         for i in range(iterations):
@@ -155,7 +155,7 @@ def demo():
     ]
 
     # 创建一个神经网络：输入层有两个节点、隐藏层有两个节点、输出层有一个节点
-    n = NN(2, 2, 1)
+    n = NN(2, 3, 1)
     # 用一些模式训练它
     n.train(pat)
     # 测试训练的成果（不要吃惊哦）
