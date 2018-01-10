@@ -33,8 +33,8 @@ class Bp
         void back_propagate(double targets[], double N = 0.5, double M = 0.1);
 };
 
-extern double** make_matrix(int row, int column, double fill = 0.0);
-extern double* array(int num, double fill = 0.0);
+extern double** make_matrix(int row, int column, double min = 0.0, double max = 0.0);
+extern double* one_array(int num, double fill = 0.0);
 extern double rand_num(double min, double max);
 extern double sigmoid(double x);
 extern double dsigmoid(double y);

@@ -13,51 +13,31 @@ using namespace std;
 
 Bp::Bp(int ni, int nh, int no)
 {
-    this->ni = ni + 1; //增加一个偏差节点
+    this->ni = ni;
     this->nh = nh;
     this->no = no;
 
     //激活神经网络的所有节点（向量）
-    this->ai = array(this->ni, 1.0);
-    this->ah = array(this->nh, 1.0);
-    this->ao = array(this->no, 1.0);
+    this->ai = one_array(this->ni, 1.0);
+    this->ah = one_array(this->nh, 1.0);
+    this->ao = one_array(this->no, 1.0);
     
-    //建立权重（矩阵）
-    this->wi = make_matrix(this->ni, this->nh);
-    this->wo = make_matrix(this->nh, this->no);
-    //并设为随机值
-    srand((unsigned int)(time(0)));
-    cout << "wi is :"<< endl;
-    for (int i = 0; i < this->ni; i++) {
-        for(int j = 0; j < this->nh; j++) {
-            this->wi[i][j] = rand_num(-0.2, 0.2);
-            cout << this->wi[i][j] << " ";
-        }
-        cout << endl;
-    } 
-
-    cout << "wo is :"<< endl;
-    for (int j = 0; j < this->nh; j++) {
-        for(int k = 0; k < this->no; k++) {
-            this->wo[j][k] = rand_num(-2.0, 2.0);
-            cout << this->wi[j][k] << " ";
-        }
-        cout << endl;
-    }
-
+    //建立权重（矩阵）//并设为随机值 
+    this->wi = make_matrix(this->ni, this->nh, -0.2, 0.2);
+    this->wo = make_matrix(this->nh, this->no, -2.0, 2.0);
+ 
     //最后建立动量因子（矩阵）
-    this->ci = make_matrix(this->ni, this->nh);
-    this->co = make_matrix(this->nh, this->no);
+    //this->ci = make_matrix(this->ni, this->nh);
+    //this->co = make_matrix(this->nh, this->no);
 
-    this->error_total = 0.0;
+    this->error_total = 0.0;//记录一组样本训练的总误差
 }
 
 void Bp::update(double inputs[])
 {
     double sum;
     //激活输入层
-    for (int i = 0; i < this->ni - 1; i++) {
-        //this->ai[i] = sigmoid(inputs[i])
+    for (int i = 0; i < this->ni; i++) {
         this->ai[i] = inputs[i];
     }
     //激活隐藏层
@@ -84,13 +64,13 @@ void Bp::back_propagate(double* targets, double N, double M)//''' 反向传播 '
     double change;
 
    // 计算输出层的误差
-    double* output_deltas = array(this->no);
+    double* output_deltas = one_array(this->no);
     for (int k = 0; k < this->no; k++) {
         error = targets[k] - this->ao[k];
         output_deltas[k] = dsigmoid(this->ao[k]) * error;
     }
     // 计算隐藏层的误差
-    double* hidden_deltas = array(this->nh);
+    double* hidden_deltas = one_array(this->nh);
     for (int j = 0; j < this->nh; j++) {
         error = 0.0;
         for (int k = 0; k < this->no; k++)
@@ -101,8 +81,8 @@ void Bp::back_propagate(double* targets, double N, double M)//''' 反向传播 '
     for (int j = 0; j < this->nh; j++) {
         for (int k = 0; k < this->no; k++) {
             change = output_deltas[k] * this->ah[j];
-            this->wo[j][k] = this->wo[j][k] + N * change + M * this->co[j][k];
-            this->co[j][k] = change;
+            this->wo[j][k] = this->wo[j][k] + N * change; //+ M * this->co[j][k];
+            //this->co[j][k] = change;
             //print(N * change, M * this->co[j][k])
         }
     }
@@ -110,8 +90,8 @@ void Bp::back_propagate(double* targets, double N, double M)//''' 反向传播 '
     for (int i = 0; i < this->ni; i++) {
         for (int j = 0; j < this->nh; j++) {
             change = hidden_deltas[j] * this->ai[i];
-            this->wi[i][j] = this->wi[i][j] + N * change + M * this->ci[i][j];
-            this->ci[i][j] = change;
+            this->wi[i][j] = this->wi[i][j] + N * change;// + M * this->ci[i][j];
+            //this->ci[i][j] = change;
         }
     }
     // 计算误差
@@ -130,7 +110,7 @@ void Bp::train(double inputs[], double targets[])
 void Bp::test_result(double inputs[])
 {
     this->update(inputs);
-    for (int i = 0; i < this->ni - 1; i++)
+    for (int i = 0; i < this->ni; i++)
         cout << this->ai[i] << ",";
     cout << " -> ";
     for (int i = 0; i < this->no; i++)
@@ -150,7 +130,7 @@ void Bp::print_weights(void)
 }
 
 
-double* array(int num, double fill)
+double* one_array(int num, double fill)
 {
     double* a = new double[num];
     for (int i = 0; i < num; i++) {
@@ -159,14 +139,15 @@ double* array(int num, double fill)
     return a;
 }
 
-double** make_matrix(int row, int column, double fill)
+double** make_matrix(int row, int column, double min, double max)
 {
+    srand((unsigned int)(time(0)));
     double **m = new double *[column];
 
     for (int i = 0; i < row; i++) {
         m[i] = new double [column];
         for (int j = 0; j < column; j++) {
-            m[i][j] = fill;
+            m[i][j] = rand_num(min, max);
         }
     }
 
@@ -182,11 +163,13 @@ double rand_num(double min, double max)
 //激活函数sigmoid
 double sigmoid(double x)
 {
-    return (exp(x) - exp(-x)) / (exp(x) + exp(-x));
+    //return (exp(x) - exp(-x)) / (exp(x) + exp(-x));
+    return 1.0 / (1.0 + exp(-x));
 }
 
 //sigmoid函数的导数
 double dsigmoid(double y)
 {
-    return 1.0 - pow(y, 2);
+    //return 1.0 - pow(y, 2);
+    return y * (1 - y);
 }

@@ -1,0 +1,33 @@
+#include <iostream>
+#include <cstdlib>
+#include <ctime>
+
+using namespace std;
+
+double rand_num(double min, double max)
+{
+    return min + (max - min) * rand() / RAND_MAX;
+    
+}
+
+double** make_matrix(int row, int column, double fill)
+{
+    double **m = new double *[column];
+     srand((unsigned int)(time(0)));
+
+    for (int i = 0; i < row; i++) {
+        m[i] = new double [column];
+        for (int j = 0; j < column; j++) {
+            m[i][j] = rand_num(-0.2, 0.2);
+            cout << m[i][j] << " " ;
+        }
+        cout << endl;
+    }
+
+    return m;
+}
+
+int main()
+{
+    make_matrix(5,1,1);
+}
