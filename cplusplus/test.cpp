@@ -2,7 +2,7 @@
 
 #include "Bp.h"
 
-#define ITERATIONS 100000
+#define ITERATIONS 1000
 #define DATA_NUM 4
 
 using namespace std;
@@ -18,10 +18,11 @@ int main()
 
 void demo()
 {
-    int nh = 4;
+    int nh = 10;
 
     // 创建一个神经网络：输入层有两个节点、隐藏层有nh个节点、输出层有一个节点
     Bp mybp = Bp(2, nh, 1);
+    int i, j;
 
     //一个演示：教神经网络学习逻辑异或（XOR
     double inputs[DATA_NUM][2] =  { {0, 0}, 
@@ -33,10 +34,10 @@ void demo()
                                     {1},
                                     {0} };
 
-    for (int i = 0; i < ITERATIONS; i++) {
+    for (i = 0; i < ITERATIONS; i++) {
         // 用一些模式训练它
         mybp.error_total = 0.0;
-        for (int j = 0; j < DATA_NUM; j++)
+        for (j = 0; j < DATA_NUM; j++)
             mybp.train(inputs[j], targets[j]);
         if (i % 100 == 0)
             // printf("error_total %.5f\n", mybp.error_total);
@@ -44,7 +45,7 @@ void demo()
     }
 
     // 测试训练的成果
-    for (int i = 0; i < 4; i++)
+    for (i = 0; i < 4; i++)
     {
         mybp.test_result(inputs[i]);
     }
