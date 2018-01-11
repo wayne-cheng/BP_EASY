@@ -12,8 +12,8 @@ class Bp
         Bp();
         Bp(int ni, int nh, int no);
         void train(double inputs[], double targets[]);
-        void test_result(double inputs[]);
         void print_weights();
+        void test_result(double inputs[]);
 
     private:
         double* ai;
@@ -23,19 +23,18 @@ class Bp
         double** wi;
         double** wo;
 
-        double** ci;
-        double** co;
+        // double** ci;
+        // double** co;
 
         double** inputs;
         double** targets;
 
         void update(double inputs[]);
-        void back_propagate(double targets[], double N = 0.5, double M = 0.1);
+        void back_propagate(double targets[], double N = 0.5);//, double M = 0.1);
 };
 
 extern double** make_matrix(int row, int column, double min = 0.0, double max = 0.0);
-extern double* one_array(int num, double fill = 0.0);
-extern double rand_num(double min, double max);
+
 extern double sigmoid(double x);
 extern double dsigmoid(double y);
 
