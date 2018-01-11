@@ -9,7 +9,6 @@ class Bp
         int no;
         double error_total;
         
-        Bp();
         Bp(int ni, int nh, int no);
         void train(double inputs[], double targets[]);
         void print_weights();
