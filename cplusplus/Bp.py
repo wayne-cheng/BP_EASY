@@ -95,6 +95,41 @@ except __builtin__.Exception:
         pass
     _newclass = 0
 
+class doubleArray(_object):
+    __swig_setmethods__ = {}
+    __setattr__ = lambda self, name, value: _swig_setattr(self, doubleArray, name, value)
+    __swig_getmethods__ = {}
+    __getattr__ = lambda self, name: _swig_getattr(self, doubleArray, name)
+    __repr__ = _swig_repr
+
+    def __init__(self, nelements):
+        this = _Bp.new_doubleArray(nelements)
+        try:
+            self.this.append(this)
+        except __builtin__.Exception:
+            self.this = this
+    __swig_destroy__ = _Bp.delete_doubleArray
+    __del__ = lambda self: None
+
+    def __getitem__(self, index):
+        return _Bp.doubleArray___getitem__(self, index)
+
+    def __setitem__(self, index, value):
+        return _Bp.doubleArray___setitem__(self, index, value)
+
+    def cast(self):
+        return _Bp.doubleArray_cast(self)
+    if _newclass:
+        frompointer = staticmethod(_Bp.doubleArray_frompointer)
+    else:
+        frompointer = _Bp.doubleArray_frompointer
+doubleArray_swigregister = _Bp.doubleArray_swigregister
+doubleArray_swigregister(doubleArray)
+
+def doubleArray_frompointer(t):
+    return _Bp.doubleArray_frompointer(t)
+doubleArray_frompointer = _Bp.doubleArray_frompointer
+
 class Bp(_object):
     __swig_setmethods__ = {}
     __setattr__ = lambda self, name, value: _swig_setattr(self, Bp, name, value)

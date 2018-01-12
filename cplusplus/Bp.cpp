@@ -40,7 +40,7 @@ Bp::Bp(int ni, int nh, int no)
 void Bp::update(double inputs[])
 {
     double sum;
-    register int i, j, k;
+    int i, j, k;
 
     //激活输入层
     for (i = 0; i < this->ni; i++) 
