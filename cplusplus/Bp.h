@@ -1,5 +1,5 @@
-#ifndef BP
-#define BP
+#ifndef BP_H
+#define BP_H
 
 class Bp
 {

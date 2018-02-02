@@ -151,7 +151,6 @@ double** make_matrix(int row, int column, double min, double max)
         for (j = 0; j < column; j++) {
             m[i][j] = RAND_DOUBLE(min, max);
         }
-        cout << endl;
     }
 
     return m;
